@@ -40,7 +40,7 @@ export default function RootLayout({
                 <img
                   src="/logo.jpeg"
                   alt="Aafiya Siddha Varmam Clinic"
-                  className="w-full h-full object-cover scale-125"
+                  className="w-full h-full object-contain p-1"
                 />
               </div>
               <span className="text-lg sm:text-2xl font-bold text-primary">
