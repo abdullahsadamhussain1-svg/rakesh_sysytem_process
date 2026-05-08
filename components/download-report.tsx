@@ -27,10 +27,10 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
                 if (y > 260) { doc.addPage(); y = 15; }
                 doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
-                doc.setTextColor(30, 64, 175);
+                doc.setTextColor(21, 128, 61);
                 doc.text(text, 14, y);
                 y += 2;
-                doc.setDrawColor(219, 234, 254);
+                doc.setDrawColor(220, 252, 231);
                 doc.line(14, y, pageWidth - 14, y);
                 y += 6;
             };
@@ -50,12 +50,12 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
             };
 
             // ── Header ──
-            doc.setFillColor(30, 64, 175);
+            doc.setFillColor(21, 128, 61);
             doc.rect(0, 0, pageWidth, 40, 'F');
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(15);
             doc.setFont('helvetica', 'bold');
-            doc.text('Prasad Physiotherapy Clinic', pageWidth / 2, 16, { align: 'center' });
+            doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 16, { align: 'center' });
             doc.setFontSize(9);
             doc.setFont('helvetica', 'normal');
             doc.text(`Patient ID: #${String(assessment.id || 'NEW').padStart(4, '0')}`, pageWidth / 2, 23, { align: 'center' });
@@ -164,7 +164,7 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
                 doc.text('This document is a confidential medical record and should be treated as such.', pageWidth / 2, 292, { align: 'center' });
             }
 
-            const fileName = `PhysioReport_${(assessment.PatientName || 'Patient').replace(/\s+/g, '_')}_${assessment.Date || 'NoDate'}.pdf`;
+            const fileName = `AafiyaReport_${(assessment.PatientName || 'Patient').replace(/\s+/g, '_')}_${assessment.Date || 'NoDate'}.pdf`;
             doc.save(fileName);
         } catch (error) {
             console.error('PDF generation error:', error);
@@ -180,7 +180,7 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
             disabled={isGenerating} 
             variant="outline" 
             size="sm" 
-            className={cn("gap-2 border-blue-200 hover:bg-blue-50 text-blue-700 font-bold h-11", className)}
+            className={cn("gap-2 border-green-200 hover:bg-green-50 text-green-700 font-bold h-11", className)}
         >
             <FileDown className="h-4 w-4 shrink-0" />
             <span className="truncate">
