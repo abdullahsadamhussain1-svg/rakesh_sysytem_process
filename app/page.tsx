@@ -4,8 +4,7 @@ import Link from "next/link";
 import { PlusCircle, RefreshCw } from "lucide-react";
 import { DashboardTable } from "@/components/dashboard-table";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0; // Always fetch fresh data
+// Caching enabled for instant load times
 
 export default async function Home() {
   let assessments = [];

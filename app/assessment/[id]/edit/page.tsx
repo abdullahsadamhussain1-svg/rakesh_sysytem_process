@@ -5,8 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Caching enabled for instant load times
 
 interface PageProps {
     params: Promise<{

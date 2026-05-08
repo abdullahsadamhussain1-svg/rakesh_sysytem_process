@@ -53,6 +53,9 @@ export async function PUT(
             return NextResponse.json({ error: result.error }, { status: 400 });
         }
 
+        const { revalidatePath } = require('next/cache');
+        revalidatePath('/', 'layout');
+
         return NextResponse.json(result);
     } catch (error) {
         console.error("API Update Error:", error);

@@ -8,8 +8,7 @@ import { formatDate, formatDateTime } from "@/lib/format-date";
 import { DownloadReportButton } from "@/components/download-report";
 import { ClinicalMediaGallery } from "@/components/media-gallery";
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Caching enabled for instant load times
 
 interface PageProps {
     params: Promise<{
