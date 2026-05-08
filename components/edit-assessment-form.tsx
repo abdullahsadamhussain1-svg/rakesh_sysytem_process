@@ -16,78 +16,25 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft, Camera, Video, X, Upload, FileVideo, Plus, User, ClipboardList, Activity, Stethoscope, FileText } from "lucide-react";
+import { ArrowLeft, Camera, Video, X, Upload, FileVideo, Plus, User, ClipboardList, Banknote, Activity } from "lucide-react";
 import { getIndiaDateString } from "@/lib/format-date";
-import { sanitizeFormData, validateFileSize, checkDuplicate, compressImage, convertDriveUrl, isVideoUrl, calculatePayloadSize, formatBytes, stripBase64Metadata } from "@/lib/utils-data";
-import { getFromGoogleSheet } from "@/lib/apps-script";
+import { sanitizeFormData, validateFileSize, compressImage, convertDriveUrl, isVideoUrl, calculatePayloadSize, formatBytes, stripBase64Metadata } from "@/lib/utils-data";
 
 const formSchema = z.object({
-    // I. Patient Demographics (1-13)
     date: z.string(),
-    name: z.string().min(2, "Name is required"),
-    age: z.any().optional(),
-    sex: z.any().optional(),
-    occupation: z.any().optional(),
-    phoneNumber: z.any().optional(),
-    height: z.any().optional(),
-    weight: z.any().optional(),
-    bloodPressure: z.any().optional(),
-    diabeticMellitus: z.any().optional(),
-    dietHabit: z.any().optional(),
-    sleepingHistory: z.any().optional(),
-    menstruationHistory: z.any().optional(),
-
-    // II. Clinical History (14-18)
+    patientName: z.string().min(2, "Name is required"),
+    phoneNumber: z.string().optional(),
+    medicalHistory: z.string().optional(),
+    bpSugar: z.string().optional(),
     chiefComplaint: z.string().optional(),
-    presentHistory: z.string().optional(),
-    pastHistory: z.string().optional(),
-    diagnosticImaging: z.string().optional(),
-    redFlags: z.string().optional(),
-
-    // III. Observation & Physical Examination (19-34)
-    observation: z.string().optional(),
-    activeROM: z.string().optional(),
-    passiveROM: z.string().optional(),
-    musclePower: z.string().optional(),
-    palpation: z.string().optional(),
-    gait: z.string().optional(),
-    neurologicalTests: z.string().optional(),
-    sensation: z.string().optional(),
-    reflexes: z.string().optional(),
-    specialTests: z.string().optional(),
-    functionalTesting: z.string().optional(),
-    comments: z.string().optional(),
-
-    // IV. Pain Assessment (35-40)
-    painHistory: z.string().optional(),
-    aggravatingFactors: z.string().optional(),
-    easingFactors: z.string().optional(),
-    painDescription: z.string().optional(),
-    painVas: z.number().min(0).max(100),
-    symptomsLocation: z.string().optional(),
-
-    // V. Diagnosis & Treatment Plan (41-48)
-    problemList: z.string().optional(),
     diagnosis: z.string().optional(),
-    treatmentPlan: z.string().optional(),
-    manualTherapy: z.string().optional(),
-    electrotherapy: z.string().optional(),
-    exercisePrescription: z.string().optional(),
-    patientEducation: z.string().optional(),
-    homeFollowups: z.string().optional(),
-    whatTreatment: z.string().optional(),
-
-    // VI. Summary & Follow-up (49-56)
-    review1: z.string().optional(),
-    review2: z.string().optional(),
-    review3: z.string().optional(),
-    dailyNote: z.string().optional(),
+    treatmentDone: z.string().optional(),
+    adviceGiven: z.string().optional(),
+    feesCollected: z.string().optional(),
+    paidAmount: z.string().optional(),
+    pendingAmount: z.string().optional()
 });
 
 interface EditFormProps {
@@ -112,7 +59,6 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
     const chunksRef = useRef<Blob[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Effect to bind stream to video element once it's mounted
     useEffect(() => {
         if (activeStream && videoRef.current) {
             videoRef.current.srcObject = activeStream;
@@ -124,58 +70,20 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
         resolver: zodResolver(formSchema),
         defaultValues: {
             date: getIndiaDateString(assessment.Date),
-            name: String(assessment.PatientName || ""),
-            age: String(assessment.Age || ""),
-            sex: String(assessment.Sex || ""),
-            occupation: String(assessment.Occupation || ""),
+            patientName: String(assessment.PatientName || ""),
             phoneNumber: String(assessment.PhoneNumber || ""),
-            height: String(assessment.Height || ""),
-            weight: String(assessment.Weight || ""),
-            bloodPressure: String(assessment.BloodPressure || ""),
-            diabeticMellitus: String(assessment.DiabeticMellitus || ""),
-            dietHabit: String(assessment.DietHabit || ""),
-            sleepingHistory: String(assessment.SleepingHistory || ""),
-            menstruationHistory: String(assessment.MenstruationHistory || ""),
+            medicalHistory: String(assessment.MedicalHistory || ""),
+            bpSugar: String(assessment.BPSugar || ""),
             chiefComplaint: String(assessment.ChiefComplaint || ""),
-            presentHistory: String(assessment.PresentHistory || ""),
-            pastHistory: String(assessment.PastHistory || ""),
-            diagnosticImaging: String(assessment.DiagnosticImaging || ""),
-            redFlags: String(assessment.RedFlags || ""),
-            observation: String(assessment.Observation || ""),
-            activeROM: String(assessment.ActiveROM || ""),
-            passiveROM: String(assessment.PassiveROM || ""),
-            musclePower: String(assessment.MusclePower || ""),
-            palpation: String(assessment.Palpation || ""),
-            gait: String(assessment.Gait || ""),
-            neurologicalTests: String(assessment.NeurologicalTests || ""),
-            sensation: String(assessment.Sensation || ""),
-            reflexes: String(assessment.Reflexes || ""),
-            specialTests: String(assessment.SpecialTests || ""),
-            functionalTesting: String(assessment.FunctionalTesting || ""),
-            comments: String(assessment.Comments || ""),
-            painHistory: String(assessment.PainHistory || ""),
-            aggravatingFactors: String(assessment.AggravatingFactors || ""),
-            easingFactors: String(assessment.EasingFactors || ""),
-            painDescription: String(assessment.PainDescription || ""),
-            painVas: Number(assessment.PainIntensity_VAS || 0),
-            symptomsLocation: String(assessment.SymptomsLocation || ""),
-            problemList: String(assessment['Problem List'] || ""),
-            diagnosis: String(assessment.Diagnosis || assessment.diagnosis || ""),
-            treatmentPlan: String(assessment.TreatmentPlan || ""),
-            manualTherapy: String(assessment.VarmamTherapy || ""),
-            electrotherapy: String(assessment.HerbalRemedies || ""),
-            exercisePrescription: String(assessment.ExercisePrescription || ""),
-            patientEducation: String(assessment.PatientEducation || ""),
-            homeFollowups: String(assessment.HomeFollowups || ""),
-            whatTreatment: String(assessment['Specific advice'] || assessment.WhatTreatment || ""),
-            review1: String(assessment.Review1 || ""),
-            review2: String(assessment.Review2 || ""),
-            review3: String(assessment.Review3 || ""),
-            dailyNote: String(assessment.DailyNote || ""),
+            diagnosis: String(assessment.Diagnosis || ""),
+            treatmentDone: String(assessment.TreatmentDone || ""),
+            adviceGiven: String(assessment.AdviceGiven || ""),
+            feesCollected: String(assessment.FeesCollected || ""),
+            paidAmount: String(assessment.PaidAmount || ""),
+            pendingAmount: String(assessment.PendingAmount || "")
         },
     });
 
-    // Fix date format warnings by ensuring YYYY-MM-DD
     const dateValue = form.watch("date");
     useEffect(() => {
         if (dateValue && dateValue.includes('T')) {
@@ -183,7 +91,6 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
         }
     }, [dateValue, form]);
 
-    // Extract existing media on mount
     useEffect(() => {
         const media: string[] = [];
         const mediaCols = ['Media1', 'Media2', 'Media3', 'Media4'];
@@ -200,16 +107,11 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
     }, [assessment]);
 
     function onInvalid(errors: any) {
-        console.error('❌ Update Validation Errors:', errors);
-        const errorDetails = Object.entries(errors)
-            .map(([field, err]: [string, any]) => `• ${field.toUpperCase()}: ${err.message || 'Required field'}`)
-            .join("\n");
-        alert(`CANNOT UPDATE:\n\n${errorDetails}\n\nPlease check these fields.`);
+        alert("Please fill in the required Patient Name field.");
     }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
-        console.log("Saving clinical updates for index:", assessmentIndex);
         try {
             const sanitizedValues = sanitizeFormData(values);
             
@@ -225,9 +127,8 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
                 rowIndex: assessmentIndex + 2
             };
 
-            // Vercel Payload Limit Protection (4.5MB)
             const payloadSize = calculatePayloadSize(payload);
-            const MAX_PAYLOAD_SIZE = 4 * 1024 * 1024; // 4MB safety limit
+            const MAX_PAYLOAD_SIZE = 4 * 1024 * 1024; 
             
             if (payloadSize > MAX_PAYLOAD_SIZE) {
                 alert(`Update failed: Total size ${formatBytes(payloadSize)} exceeds 4MB limit. Please remove some photos or record a shorter video.`);
@@ -242,18 +143,16 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
             });
 
             const result = await response.json();
-            console.log("📥 UPDATE RESPONSE:", result);
 
-            if (!response.ok || !result.success || result.data?.success === false) {
-                const errorMsg = result.data?.message || result.data?.error || result.error || "Sync update failed (Check Apps Script)";
-                throw new Error(errorMsg);
+            if (!response.ok || !result.success) {
+                throw new Error(result.error || "Sync update failed");
             }
 
             alert("Assessment updated successfully!");
             router.push(`/assessment/${assessmentIndex}`);
             router.refresh();
         } catch (error) {
-            console.error('❌ CRITICAL UPDATE FAILURE:', error);
+            console.error('UPDATE FAILURE:', error);
             const msg = error instanceof Error ? error.message : "Sync failure (check internet)";
             alert(`UPDATE FAILED:\n${msg}`);
         } finally {
@@ -261,20 +160,15 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
         }
     }
 
-    // Camera & File logic (simplified for readability, keeping same functionality)
     const startCamera = async () => {
         setIsInitializing(true);
         try {
-            const constraints = { 
-                video: { facingMode: cameraFacing, width: { ideal: 1280 }, height: { ideal: 720 } }, 
-                audio: false 
-            };
+            const constraints = { video: { facingMode: cameraFacing, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false };
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             setActiveStream(stream);
             setIsStreaming(true);
         } catch (err) { 
-            console.error("Camera Error:", err);
-            alert("Camera not detected or lens permission denied."); 
+            alert("Camera not detected or permission denied."); 
         } finally {
             setIsInitializing(false);
         }
@@ -299,7 +193,6 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
         canvas.width = videoRef.current.videoWidth;
         canvas.height = videoRef.current.videoHeight;
         canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0);
-        // Reduced quality for better payload speed
         const base64 = canvas.toDataURL("image/jpeg", 0.6);
         setMediaFiles(prev => [...prev.slice(0, 3), { file: new File([], "cam.jpg"), base64, type: 'image' }]);
     };
@@ -321,7 +214,6 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
         mediaRecorderRef.current = recorder;
         setIsRecording(true);
 
-        // Auto-stop at 15s to keep payload manageable (Vercel limit)
         setTimeout(() => {
             if (mediaRecorderRef.current?.state === "recording") {
                 stopRecording();
@@ -363,262 +255,85 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Column 1: Core Records */}
-                    <div className="space-y-6">
-                        <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
-                            <CardHeader className="bg-primary/5 border-b py-4">
-                                <div className="flex justify-between items-center">
-                                    <CardTitle className="text-lg flex items-center gap-2"><User className="h-5 w-5 text-primary" /> Patient Demographics</CardTitle>
-                                    <Button type="button" variant="ghost" size="sm" onClick={() => router.push(`/assessment/${assessmentIndex}`)} className="text-slate-400 hover:text-red-500 font-bold transition-colors"><X className="h-4 w-4 mr-1" /> CANCEL</Button>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="p-6 space-y-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <FormField control={form.control} name="date" render={({ field }) => (
-                                        <FormItem><FormLabel>Date</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="name" render={({ field }) => (
-                                        <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="Patient Name" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-4">
-                                    <FormField control={form.control} name="age" render={({ field }) => (
-                                        <FormItem><FormLabel>Age</FormLabel><FormControl><Input placeholder="Yrs" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="sex" render={({ field }) => (
-                                        <FormItem><FormLabel>Sex</FormLabel><FormControl><Input placeholder="M/F/O" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="occupation" render={({ field }) => (
-                                        <FormItem><FormLabel>Occupation</FormLabel><FormControl><Input placeholder="Job" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                    <FormField control={form.control} name="phoneNumber" render={({ field }) => (
-                                        <FormItem><FormLabel>Contact</FormLabel><FormControl><Input placeholder="Phone" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="height" render={({ field }) => (
-                                        <FormItem><FormLabel>Height (cm)</FormLabel><FormControl><Input placeholder="cm" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="weight" render={({ field }) => (
-                                        <FormItem><FormLabel>Weight (kg)</FormLabel><FormControl><Input placeholder="kg" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <FormField control={form.control} name="bloodPressure" render={({ field }) => (
-                                        <FormItem><FormLabel>BP</FormLabel><FormControl><Input placeholder="120/80" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="diabeticMellitus" render={({ field }) => (
-                                        <FormItem><FormLabel>Diabetic Status (Yes/No)</FormLabel><FormControl><Input placeholder="Yes/No" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <FormField control={form.control} name="dietHabit" render={({ field }) => (
-                                    <FormItem><FormLabel>Dietary Habits</FormLabel><FormControl><Input placeholder="Dietary notes" {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <FormField control={form.control} name="sleepingHistory" render={({ field }) => (
-                                        <FormItem><FormLabel>Sleep History</FormLabel><FormControl><Input placeholder="Rest patterns" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="menstruationHistory" render={({ field }) => (
-                                        <FormItem><FormLabel>Menstruation</FormLabel><FormControl><Input placeholder="History" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
-                            <CardHeader className="bg-primary/5 border-b py-4">
-                                <CardTitle className="text-lg flex items-center gap-2"><ClipboardList className="h-5 w-5 text-primary" /> Clinical History</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-6 space-y-4">
-                                <FormField control={form.control} name="chiefComplaint" render={({ field }) => (
-                                    <FormItem><FormLabel>Chief Complaint</FormLabel><FormControl><Textarea className="min-h-[80px]" {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <FormField control={form.control} name="presentHistory" render={({ field }) => (
-                                    <FormItem><FormLabel>History of Present Illness</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <FormField control={form.control} name="pastHistory" render={({ field }) => (
-                                    <FormItem><FormLabel>Past Medical History</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <FormField control={form.control} name="diagnosticImaging" render={({ field }) => (
-                                    <FormItem><FormLabel>Diagnostic Imaging Results</FormLabel><FormControl><Textarea placeholder="MRI, X-Ray, etc." {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <FormField control={form.control} name="redFlags" render={({ field }) => (
-                                    <FormItem><FormLabel>Red Flags / Contraindications</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/* Column 2: Physical Findings & Plans */}
-                    <div className="space-y-6">
-                        <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
-                            <CardHeader className="bg-primary/5 border-b py-4">
-                                <CardTitle className="text-lg flex items-center gap-2"><Activity className="h-5 w-5 text-primary" /> Physical Examination</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-6 space-y-4">
-                                <FormField control={form.control} name="observation" render={({ field }) => (
-                                    <FormItem><FormLabel>Posture & Observation</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <FormField control={form.control} name="activeROM" render={({ field }) => (
-                                        <FormItem><FormLabel>Active ROM</FormLabel><FormControl><Textarea placeholder="Flex101 int. Rot.16..." {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="passiveROM" render={({ field }) => (
-                                        <FormItem><FormLabel>Passive ROM</FormLabel><FormControl><Textarea placeholder="End-feel..." {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <FormField control={form.control} name="palpation" render={({ field }) => (
-                                    <FormItem><FormLabel>Palpation (Tenderness/Effusion)</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <FormField control={form.control} name="musclePower" render={({ field }) => (
-                                        <FormItem><FormLabel>Muscle Power (MMT)</FormLabel><FormControl><Textarea placeholder="Grade 0-5" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="gait" render={({ field }) => (
-                                        <FormItem><FormLabel>Gait Analysis</FormLabel><FormControl><Textarea placeholder="Limp, etc." {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
-                            <CardHeader className="bg-primary/5 border-b py-4">
-                                <CardTitle className="text-lg flex items-center gap-2"><Stethoscope className="h-5 w-5 text-primary" /> Specialized Assessments</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-6 space-y-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <FormField control={form.control} name="neurologicalTests" render={({ field }) => (
-                                        <FormItem><FormLabel>Neuro Tests</FormLabel><FormControl><Textarea placeholder="Myotomes, etc." {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="sensation" render={({ field }) => (
-                                        <FormItem><FormLabel>Sensation</FormLabel><FormControl><Textarea placeholder="Dermatomes" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <FormField control={form.control} name="reflexes" render={({ field }) => (
-                                        <FormItem><FormLabel>Reflexes</FormLabel><FormControl><Textarea placeholder="DTRs" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="specialTests" render={({ field }) => (
-                                        <FormItem><FormLabel>Special Tests</FormLabel><FormControl><Textarea placeholder="Orthopedic tests" {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <FormField control={form.control} name="comments" render={({ field }) => (
-                                    <FormItem><FormLabel>Clinical Comments</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
-                        <CardHeader className="bg-primary/5 border-b py-4">
-                            <CardTitle className="text-lg flex items-center gap-2"><Activity className="h-5 w-5 text-primary" /> Pain Assessment</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-6 space-y-6">
-                            <FormField control={form.control} name="painVas" render={({ field }) => (
-                                <FormItem className="space-y-4">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <FormLabel className="text-primary font-bold">Pain Intensity (VAS)</FormLabel>
-                                        <Badge variant="secondary" className="px-3 py-1 text-lg font-black bg-primary/10 text-primary border-primary/20">{field.value / 10}</Badge>
-                                    </div>
-                                    <FormControl>
-                                        <Slider min={0} max={100} step={1} value={[field.value]} onValueChange={(val) => field.onChange(val[0])} className="py-4" />
-                                    </FormControl>
-                                    <div className="flex justify-between text-[10px] text-muted-foreground font-black px-1"><span>NO PAIN</span><span>MODERATE</span><span>SEVERE</span></div>
+                
+                <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
+                    <CardHeader className="bg-primary/5 border-b py-4">
+                        <div className="flex justify-between items-center">
+                            <CardTitle className="text-lg flex items-center gap-2"><User className="h-5 w-5 text-primary" /> Patient Details</CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <FormField control={form.control} name="date" render={({ field }) => (
+                                <FormItem><FormLabel>Visit Date</FormLabel><FormControl><Input type="date" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            <FormField control={form.control} name="patientName" render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="flex items-center gap-1">Patient Name/ID <span className="text-red-500 font-bold">*</span></FormLabel>
+                                    <FormControl><Input placeholder="Name or ID" {...field} /></FormControl>
+                                    <FormMessage />
                                 </FormItem>
                             )} />
-                            <FormField control={form.control} name="painHistory" render={({ field }) => (
-                                <FormItem><FormLabel>Pain History</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormField control={form.control} name="phoneNumber" render={({ field }) => (
+                                <FormItem><FormLabel>Mobile Number</FormLabel><FormControl><Input placeholder="Phone Number" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
-                            <FormField control={form.control} name="painDescription" render={({ field }) => (
-                                <FormItem><FormLabel>Pain Description</FormLabel><FormControl><Textarea placeholder="Burning, Sharp, etc." {...field} /></FormControl><FormMessage /></FormItem>
-                            )} />
-                            <FormField control={form.control} name="symptomsLocation" render={({ field }) => (
-                                <FormItem><FormLabel>Symptoms Location</FormLabel><FormControl><Textarea placeholder="Left leg, etc." {...field} /></FormControl><FormMessage /></FormItem>
-                            )} />
-                            <div className="space-y-4">
-                                <FormField control={form.control} name="aggravatingFactors" render={({ field }) => (
-                                    <FormItem><FormLabel>Aggravating</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <FormField control={form.control} name="easingFactors" render={({ field }) => (
-                                    <FormItem><FormLabel>Easing</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                    <div className="space-y-6">
-                        <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
-                            <CardHeader className="bg-primary/5 border-b py-4">
-                                <CardTitle className="text-lg flex items-center gap-2"><FileText className="h-5 w-5 text-primary" /> Treatment Plan</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-6 space-y-4">
-                                <FormField control={form.control} name="problemList" render={({ field }) => (
-                                    <FormItem><FormLabel>Problem List</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <FormField control={form.control} name="diagnosis" render={({ field }) => (
-                                    <FormItem><FormLabel>Clinical Diagnosis</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <FormField control={form.control} name="treatmentPlan" render={({ field }) => (
-                                    <FormItem><FormLabel>Treatment Strategy</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <div className="space-y-4">
-                                    <FormField control={form.control} name="manualTherapy" render={({ field }) => (
-                                        <FormItem><FormLabel>Varmam Therapy</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="electrotherapy" render={({ field }) => (
-                                        <FormItem><FormLabel>Thokkanam / Herbal Remedies</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <FormField control={form.control} name="exercisePrescription" render={({ field }) => (
-                                    <FormItem><FormLabel>Exercise Prescription</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <div className="space-y-4">
-                                    <FormField control={form.control} name="patientEducation" render={({ field }) => (
-                                        <FormItem><FormLabel>Education</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="homeFollowups" render={({ field }) => (
-                                        <FormItem><FormLabel>Follow-ups</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                                <FormField control={form.control} name="whatTreatment" render={({ field }) => (
-                                    <FormItem><FormLabel>Specific advise</FormLabel><FormControl><Textarea placeholder="Modalities used today" {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                            </CardContent>
-                        </Card>
+                <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
+                    <CardHeader className="bg-primary/5 border-b py-4">
+                        <CardTitle className="text-lg flex items-center gap-2"><ClipboardList className="h-5 w-5 text-primary" /> Clinical Assessment</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <FormField control={form.control} name="medicalHistory" render={({ field }) => (
+                                <FormItem><FormLabel>Medical History</FormLabel><FormControl><Textarea className="min-h-[80px]" placeholder="Past medical history..." {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            <FormField control={form.control} name="bpSugar" render={({ field }) => (
+                                <FormItem><FormLabel>BP / Sugar</FormLabel><FormControl><Textarea className="min-h-[80px]" placeholder="e.g. BP 120/80, Sugar 110" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                        </div>
+                        <FormField control={form.control} name="chiefComplaint" render={({ field }) => (
+                            <FormItem><FormLabel>Chief Complaint</FormLabel><FormControl><Textarea placeholder="Main issue..." {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="diagnosis" render={({ field }) => (
+                            <FormItem><FormLabel>Diagnosis</FormLabel><FormControl><Textarea placeholder="Clinical diagnosis" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="treatmentDone" render={({ field }) => (
+                            <FormItem><FormLabel>Treatment Done</FormLabel><FormControl><Textarea placeholder="Details of treatment provided today..." {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                        <FormField control={form.control} name="adviceGiven" render={({ field }) => (
+                            <FormItem><FormLabel>Advice Given</FormLabel><FormControl><Textarea placeholder="Home care or lifestyle advice" {...field} /></FormControl><FormMessage /></FormItem>
+                        )} />
+                    </CardContent>
+                </Card>
 
-                        <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
-                            <CardHeader className="bg-primary/5 border-b py-4">
-                                <CardTitle className="text-lg flex items-center gap-2"><FileText className="h-5 w-5 text-primary" /> Summary & Reviews</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-6 space-y-4">
-                                <FormField control={form.control} name="dailyNote" render={({ field }) => (
-                                    <FormItem><FormLabel className="text-primary font-bold">Daily Consultation Note</FormLabel><FormControl><Textarea className="min-h-[120px] bg-white" placeholder="Progress notes for today..." {...field} /></FormControl><FormMessage /></FormItem>
-                                )} />
-                                <div className="space-y-4">
-                                    <FormField control={form.control} name="review1" render={({ field }) => (
-                                        <FormItem><FormLabel>Review 1</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="review2" render={({ field }) => (
-                                        <FormItem><FormLabel>Review 2</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="review3" render={({ field }) => (
-                                        <FormItem><FormLabel>Review 3</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                                    )} />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
+                <Card className="rounded-2xl shadow-lg border-primary/10 overflow-hidden">
+                    <CardHeader className="bg-primary/5 border-b py-4">
+                        <CardTitle className="text-lg flex items-center gap-2"><Banknote className="h-5 w-5 text-primary" /> Billing Information</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                            <FormField control={form.control} name="feesCollected" render={({ field }) => (
+                                <FormItem><FormLabel>Total Fees Collected (₹)</FormLabel><FormControl><Input type="number" placeholder="0" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            <FormField control={form.control} name="paidAmount" render={({ field }) => (
+                                <FormItem><FormLabel>Paid Amount (₹)</FormLabel><FormControl><Input type="number" placeholder="0" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                            <FormField control={form.control} name="pendingAmount" render={({ field }) => (
+                                <FormItem><FormLabel>Pending Amount (₹)</FormLabel><FormControl><Input type="number" placeholder="0" className="border-red-200 focus-visible:ring-red-500" {...field} /></FormControl><FormMessage /></FormItem>
+                            )} />
+                        </div>
+                    </CardContent>
+                </Card>
 
                 <Card className="overflow-hidden border-2 border-primary/10 bg-muted/5 rounded-3xl">
                     <CardHeader className="bg-primary/5 flex flex-row items-center justify-between py-5 border-b">
                         <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center shadow-inner"><Camera className="h-5 w-5 text-primary" /></div>
                             <div>
-                                <CardTitle className="text-xl font-black tracking-tight">Clinical Media Evidence</CardTitle>
+                                <CardTitle className="text-xl font-black tracking-tight">Clinical Evidence Capture</CardTitle>
                                 <p className="text-xs text-muted-foreground font-medium">Add up to 4 clinical status captures</p>
                             </div>
                         </div>
@@ -678,7 +393,7 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
                                     <div className="text-center p-12 max-w-sm">
                                         <div className="h-24 w-24 rounded-3xl bg-primary/10 flex items-center justify-center mx-auto mb-8 shadow-inner border border-primary/5"><Camera className="h-10 w-10 text-primary/40" /></div>
                                         <h4 className="text-white text-xl font-black mb-3 tracking-tight">Ready for Evidence</h4>
-                                        <p className="text-white/40 text-sm mb-10 font-medium leading-relaxed">Activate camera to document physical indicators, postural alignment, or ROM limitations.</p>
+                                        <p className="text-white/40 text-sm mb-10 font-medium leading-relaxed">Activate camera to document physical indicators or treatments.</p>
                                         <Button type="button" onClick={startCamera} className="w-full h-14 rounded-2xl text-sm font-black tracking-widest bg-blue-600 hover:bg-blue-700 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] transition-all active:scale-[0.98]">INITIALIZE CLINICAL OPTICS</Button>
                                     </div>
                                 )}

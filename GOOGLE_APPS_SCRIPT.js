@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /**
- * Aafiya Siddha Varmam Clinic - Backend Sync Engine (v2.5 - Final)
- * Solves: Date Mismatch, Duplicates on Edit, and Phantom Columns.
- * Updated: Problem List, Specific advice, Removed Clinical Summary.
+ * Aafiya Siddha Varmam Clinic - Backend Sync Engine (v3.0 - Billing & Clinical)
+ * Simplified 12-Field Schema + Media Uploads.
  */
 
 const SHEET_NAME = "Sheet1"; 
@@ -120,42 +119,36 @@ function getOrCreateMediaFolder() {
  */
 function migrateClinicalData() {
   const sheet = getOrCreateSheet();
-  const headers = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 1)).getValues()[0];
-  const deprecated = ["24-hour response", "status", "injury type", "authentication by"];
   
-  Logger.log("Starting Fix on Sheet1...");
+  Logger.log("Starting Clean Wipe and Header Setup on Sheet1...");
   
-  // 1. Delete bad columns
-  for (let i = headers.length - 1; i >= 0; i--) {
-    if (deprecated.some(d => headers[i].toLowerCase().includes(d.toLowerCase()))) {
-      sheet.deleteColumn(i + 1);
-    }
-  }
+  // Wipe everything
+  sheet.clear();
   
-  // 2. Purge extra phantom columns (Column 55+)
-  const coreCount = getCoreHeaders().length;
-  if (sheet.getLastColumn() > coreCount) {
-    const extra = sheet.getLastColumn() - coreCount;
-    sheet.deleteColumns(coreCount + 1, extra);
-  }
-  
-  // 3. Re-set Header Titles on Sheet1
+  // Re-set Header Titles on Sheet1
   setupHeaders();
-  Logger.log("FIX COMPLETE: Sheet1 is now clean and aligned.");
+  Logger.log("FIX COMPLETE: Sheet1 is now completely clean with the new 12-field schema.");
 }
 
 function getCoreHeaders() {
   return [
-    "Date", "PatientName", "Age", "Sex", "Occupation", "PhoneNumber", "Height", "Weight", 
-    "BloodPressure", "DiabeticMellitus", "DietHabit", "SleepingHistory", "MenstruationHistory",
-    "ChiefComplaint", "PresentHistory", "PastHistory", "DiagnosticImaging", "RedFlags",
-    "Observation", "ActiveROM", "PassiveROM", "MusclePower", "Palpation", "Gait", 
-    "NeurologicalTests", "Sensation", "Reflexes", "SpecialTests", "FunctionalTesting", "Comments",
-    "PainHistory", "AggravatingFactors", "EasingFactors", "PainDescription", "PainIntensity_VAS", "SymptomsLocation",
-    "Problem List", "Diagnosis", "TreatmentPlan", "VarmamTherapy", "HerbalRemedies", "ExercisePrescription", 
-    "PatientEducation", "HomeFollowups", "Specific advice",
-    "Review1", "Review2", "Review3", "DailyNote",
-    "Media1", "Media2", "Media3", "Media4", "Timestamp"
+    "PatientName",
+    "Date",
+    "PhoneNumber",
+    "MedicalHistory",
+    "BPSugar",
+    "ChiefComplaint",
+    "Diagnosis",
+    "TreatmentDone",
+    "AdviceGiven",
+    "FeesCollected",
+    "PaidAmount",
+    "PendingAmount",
+    "Media1",
+    "Media2",
+    "Media3",
+    "Media4",
+    "Timestamp"
   ];
 }
 

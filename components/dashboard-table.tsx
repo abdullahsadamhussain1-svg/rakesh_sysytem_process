@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
 import {
     Table,
     TableBody,
@@ -15,35 +13,18 @@ import {
 } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, RefreshCw, Eye, Pencil, Trash2, LayoutDashboard, PlusCircle, FileText, CheckCircle2, AlertCircle, Save } from "lucide-react";
+import { Search, RefreshCw, Banknote } from "lucide-react";
 import { formatDateShort } from "@/lib/format-date";
-import { cn } from "@/lib/utils";
-import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet";
-import { Textarea } from "@/components/ui/textarea";
-
-import { DailyNoteSheet } from "@/components/daily-note-sheet";
 
 interface Assessment {
     id: number | string;
     Date: string;
     Timestamp?: string;
     PatientName: string;
-    Age: string;
-    Occupation: string;
     Diagnosis?: string;
-    ChiefComplaint?: string;
-    PastHistory?: string;
-    PainIntensity_VAS?: string | number;
-    DailyNote?: string;
     PhoneNumber?: string;
-    Sex?: string;
+    FeesCollected?: string;
+    PendingAmount?: string;
     [key: string]: any;
 }
 
@@ -55,9 +36,6 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
     const [searchQuery, setSearchQuery] = useState("");
     const router = useRouter();
     const [isRefreshing, setIsRefreshing] = useState(false);
-
-    // Create a mapping for patient slugs
-    const getSlug = (name: string) => (name || '').trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
     const handleRefresh = () => {
         setIsRefreshing(true);
@@ -76,13 +54,11 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
         return (
             (assessment.PatientName && String(assessment.PatientName).toLowerCase().includes(query)) ||
             (assessment.Diagnosis && String(assessment.Diagnosis).toLowerCase().includes(query)) ||
-            (assessment.ChiefComplaint && String(assessment.ChiefComplaint).toLowerCase().includes(query)) ||
             (assessment.Date && String(assessment.Date).toLowerCase().includes(query)) ||
             (assessment.PhoneNumber && String(assessment.PhoneNumber).toLowerCase().includes(query))
         );
     });
 
-    // Button and Row performance optimization: instant feedback
     const btnClass = "transition-none active:scale-[0.98]";
     const rowClass = "group hover:bg-slate-50 transition-colors cursor-pointer active:bg-slate-100";
 
@@ -93,7 +69,7 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         type="text"
-                        placeholder="Search patient name, diagnosis..."
+                        placeholder="Search patient name, diagnosis, phone..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-9 h-10 rounded-xl"
@@ -118,10 +94,10 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
                             <TableRow>
                                 <TableHead className="w-[110px] px-3 font-black text-[11px] uppercase tracking-widest text-slate-800">Date</TableHead>
                                 <TableHead className="w-[240px] px-3 font-black text-[11px] uppercase tracking-widest text-slate-800">Patient Details</TableHead>
-                                <TableHead className="w-[140px] px-3 text-center font-black text-[11px] uppercase tracking-widest text-slate-800">Occupation</TableHead>
                                 <TableHead className="w-[140px] px-3 text-center font-black text-[11px] uppercase tracking-widest text-slate-800">Contact</TableHead>
-                                <TableHead className="w-[250px] px-3 font-black text-[11px] uppercase tracking-widest text-slate-800">Clinical Diagnosis</TableHead>
-                                <TableHead className="w-[200px] px-3 font-black text-[11px] uppercase tracking-widest text-slate-800">DAILY NOTE</TableHead>
+                                <TableHead className="w-[250px] px-3 font-black text-[11px] uppercase tracking-widest text-slate-800">Diagnosis</TableHead>
+                                <TableHead className="w-[140px] px-3 text-right font-black text-[11px] uppercase tracking-widest text-slate-800">Total Fee</TableHead>
+                                <TableHead className="w-[140px] px-3 text-right font-black text-[11px] uppercase tracking-widest text-slate-800">Pending</TableHead>
                                 <TableHead className="text-right w-[140px] px-3 pr-8 font-black text-[11px] uppercase tracking-widest text-slate-800">Action</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -129,12 +105,13 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
                             {filteredAssessments.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={7} className="h-32 text-center text-muted-foreground italic">
-                                        {searchQuery ? "No results found." : "No assessments recorded yet."}
+                                        {searchQuery ? "No results found." : "No patient records found."}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 filteredAssessments.map((assessment) => {
                                     const targetId = assessment.id;
+                                    const hasPending = Boolean(assessment.PendingAmount && Number(assessment.PendingAmount) > 0);
 
                                     return (
                                         <TableRow 
@@ -151,20 +128,11 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
                                             <TableCell className="px-3 py-3 w-[240px]">
                                                 <div className="w-full flex flex-col gap-0.5 min-w-0">
                                                     <div className="w-full truncate">
-                                                        <span className="text-[12px] font-black leading-tight uppercase tracking-tight text-slate-900">
+                                                        <span className="text-[13px] font-black leading-tight uppercase tracking-tight text-slate-900">
                                                             {assessment.PatientName || 'Unknown'}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-x-2 text-[10px] text-muted-foreground">
-                                                        <span className="bg-slate-100 px-1 rounded font-mono shrink-0">{assessment.Age ? `${assessment.Age}y` : 'Age?'}</span>
-                                                        <span className="shrink-0">{assessment.Sex || '-'}</span>
-                                                    </div>
                                                 </div>
-                                            </TableCell>
-                                            <TableCell className="px-3 py-3 text-center w-[140px]">
-                                                <span className="text-[11px] font-bold capitalize text-slate-600 truncate block">
-                                                    {assessment.Occupation || '-'}
-                                                </span>
                                             </TableCell>
                                             <TableCell className="px-3 py-3 text-center w-[140px]">
                                                 <span className="text-[11px] text-primary font-black truncate block">
@@ -173,19 +141,23 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
                                             </TableCell>
                                             <TableCell className="px-3 py-3 w-[250px]">
                                                 <span className="text-[11px] font-bold text-slate-700 truncate block">
-                                                    {assessment.Diagnosis || assessment['Problem List'] || '-'}
+                                                    {assessment.Diagnosis || '-'}
                                                 </span>
                                             </TableCell>
-                                            <TableCell className="px-3 py-3 w-[200px]">
-                                                <DailyNoteSheet assessment={assessment} onUpdate={handleRefresh} />
+                                            <TableCell className="px-3 py-3 text-right w-[140px]">
+                                                <span className="text-[12px] font-black text-slate-800 truncate block">
+                                                    ₹{assessment.FeesCollected || '0'}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell className="px-3 py-3 text-right w-[140px]">
+                                                <span className={`text-[12px] font-black truncate block ${hasPending ? 'text-red-600 bg-red-50 inline-block px-2 py-0.5 rounded' : 'text-slate-400'}`}>
+                                                    {hasPending ? `₹${assessment.PendingAmount}` : '-'}
+                                                </span>
                                             </TableCell>
                                             <TableCell className="text-right px-3 pr-8 w-[140px]">
                                                 <div className="flex flex-row justify-end gap-2 h-full items-center" onClick={(e) => e.stopPropagation()}>
                                                     <Button variant="outline" size="sm" asChild className={`h-8 rounded-lg text-[10px] font-black px-3 ${btnClass} border-slate-200 active:scale-95 transition-all`}>
                                                         <Link href={`/assessment/${targetId}`} prefetch={true}>VIEW</Link>
-                                                    </Button>
-                                                    <Button variant="secondary" size="sm" asChild className={`h-8 rounded-lg text-[10px] font-black px-3 ${btnClass} bg-slate-100 active:scale-95 transition-all`}>
-                                                        <Link href={`/assessment/${targetId}/edit`} prefetch={true}>EDIT</Link>
                                                     </Button>
                                                 </div>
                                             </TableCell>
@@ -197,10 +169,6 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
                     </Table>
                 </div>
             </div>
-            <p className="text-[10px] text-muted-foreground text-center italic">
-                💡 Clinical Diagnosis and Daily Notes are instantly editable for rapid workflow.
-            </p>
         </div>
     );
 }
-
