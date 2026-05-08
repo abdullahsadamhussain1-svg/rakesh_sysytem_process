@@ -1,5 +1,5 @@
 /**
- * Prasad Physiotherapy Clinic - Backend Sync Engine (v2.3 - Final)
+ * Aafiya Siddha Varmam Clinic - Backend Sync Engine (v2.3 - Final)
  * Solves: Date Mismatch, Duplicates on Edit, and Phantom Columns.
  */
 
@@ -135,7 +135,7 @@ function getCoreHeaders() {
     "Observation", "ActiveROM", "PassiveROM", "MusclePower", "Palpation", "Gait", 
     "NeurologicalTests", "Sensation", "Reflexes", "SpecialTests", "FunctionalTesting", "Comments",
     "PainHistory", "AggravatingFactors", "EasingFactors", "PainDescription", "PainIntensity_VAS", "SymptomsLocation",
-    "Diagnosis", "TreatmentPlan", "ManualTherapy", "Electrotherapy", "ExercisePrescription", 
+    "Diagnosis", "TreatmentPlan", "VarmamTherapy", "HerbalRemedies", "ExercisePrescription", 
     "PatientEducation", "HomeFollowups", "WhatTreatment",
     "PatientSummary", "Review1", "Review2", "Review3", "DailyNote",
     "Media1", "Media2", "Media3", "Media4", "Timestamp"

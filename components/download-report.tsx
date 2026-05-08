@@ -139,8 +139,8 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
             addField('Problem List', assessment['Problem List']);
             addField('Clinical Diagnosis', assessment.Diagnosis);
             addField('Treatment Plan', assessment.TreatmentPlan);
-            addField('Varmam Therapy', assessment.ManualTherapy);
-            addField('Thokkanam / Herbal Remedies', assessment.Electrotherapy);
+            addField('Varmam Therapy', assessment.VarmamTherapy);
+            addField('Thokkanam / Herbal Remedies', assessment.HerbalRemedies);
             addField('Exercise Prescription', assessment.ExercisePrescription);
             addField('Patient Education', assessment.PatientEducation);
             addField('Home Follow-ups', assessment.HomeFollowups);

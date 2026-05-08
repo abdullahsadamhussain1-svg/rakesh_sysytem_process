@@ -58,8 +58,8 @@ export interface AssessmentData {
     ['Problem List']?: string;
     Diagnosis?: string;
     TreatmentPlan?: string;
-    ManualTherapy?: string;
-    Electrotherapy?: string;
+    VarmamTherapy?: string;
+    HerbalRemedies?: string;
     ExercisePrescription?: string;
     PatientEducation?: string;
     HomeFollowups?: string;

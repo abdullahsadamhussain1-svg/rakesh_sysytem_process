@@ -240,11 +240,11 @@ export default async function AssessmentDetailPage(props: PageProps) {
                                         <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
                                             <div className="flex justify-between items-center border-b border-slate-200 pb-2">
                                                 <span className="text-[10px] font-bold text-slate-400">Varmam</span>
-                                                <span className="text-xs font-bold text-slate-700">{assessment.ManualTherapy || '-'}</span>
+                                                <span className="text-xs font-bold text-slate-700">{assessment.VarmamTherapy || '-'}</span>
                                             </div>
                                             <div className="flex justify-between items-center border-b border-slate-200 pb-2">
                                                 <span className="text-[10px] font-bold text-slate-400">Herbal</span>
-                                                <span className="text-xs font-bold text-slate-700">{assessment.Electrotherapy || '-'}</span>
+                                                <span className="text-xs font-bold text-slate-700">{assessment.HerbalRemedies || '-'}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-[10px] font-bold text-slate-400">Exercise</span>
