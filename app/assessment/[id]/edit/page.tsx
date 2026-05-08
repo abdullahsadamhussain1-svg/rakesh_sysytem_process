@@ -2,6 +2,8 @@ import { getFromGoogleSheet } from "@/lib/apps-script";
 import { EditAssessmentForm } from "@/components/edit-assessment-form";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -38,5 +40,22 @@ export default async function EditAssessmentPage(props: PageProps) {
 
     const assessment = assessments[assessmentIndex];
 
-    return <EditAssessmentForm assessment={assessment} assessmentIndex={assessmentIndex} />;
+    return (
+        <div className="max-w-4xl mx-auto py-2">
+            <div className="flex items-start justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Edit Assessment</h1>
+                    <p className="text-muted-foreground mt-1">
+                        Modify the details for {assessment.PatientName || 'this patient'}.
+                    </p>
+                </div>
+                <Button variant="outline" size="icon" asChild className="rounded-full shadow-sm hover:bg-destructive/10 hover:text-destructive border-slate-200 transition-colors">
+                    <Link href={`/assessment/${assessmentIndex}`}>
+                        <X className="h-5 w-5" />
+                    </Link>
+                </Button>
+            </div>
+            <EditAssessmentForm assessment={assessment} assessmentIndex={assessmentIndex} />
+        </div>
+    );
 }
