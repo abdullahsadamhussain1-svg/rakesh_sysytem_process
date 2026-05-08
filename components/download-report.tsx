@@ -47,20 +47,53 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
                 y += Math.max(lines.length * 5, 6) + 2;
             };
 
+            // Load Logo
+            let logoBase64 = null;
+            try {
+                const response = await fetch('/logo.jpeg');
+                const blob = await response.blob();
+                logoBase64 = await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.readAsDataURL(blob);
+                });
+            } catch (e) {
+                console.warn('Failed to load logo', e);
+            }
+
             // ── Header ──
             doc.setFillColor(21, 128, 61);
-            doc.rect(0, 0, pageWidth, 40, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(15);
-            doc.setFont('helvetica', 'bold');
-            doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 16, { align: 'center' });
-            doc.setFontSize(9);
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Record ID: #${String(assessment.id || 'NEW').padStart(4, '0')}`, pageWidth / 2, 23, { align: 'center' });
-            doc.setFontSize(11);
-            doc.setFont('helvetica', 'bold');
-            doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 32, { align: 'center' });
-            y = 50;
+            doc.rect(0, 0, pageWidth, logoBase64 ? 50 : 40, 'F');
+            
+            if (logoBase64) {
+                doc.setFillColor(255, 255, 255);
+                doc.circle(pageWidth / 2, 16, 9, 'F');
+                doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 8, 8, 16, 16);
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(15);
+                doc.setFont('helvetica', 'bold');
+                doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 32, { align: 'center' });
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 38, { align: 'center' });
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 46, { align: 'center' });
+                y = 60;
+            } else {
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(15);
+                doc.setFont('helvetica', 'bold');
+                doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 16, { align: 'center' });
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 23, { align: 'center' });
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 32, { align: 'center' });
+                y = 50;
+            }
 
             // ── Patient Demographics ──
             addTitle('I. PATIENT DETAILS');
