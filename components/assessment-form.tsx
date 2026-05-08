@@ -547,10 +547,10 @@ export function AssessmentForm() {
                                 )} />
                                 <div className="space-y-4">
                                     <FormField control={form.control} name="manualTherapy" render={({ field }) => (
-                                        <FormItem><FormLabel>Manual Therapy</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                                        <FormItem><FormLabel>Varmam Therapy</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
                                     )} />
                                     <FormField control={form.control} name="electrotherapy" render={({ field }) => (
-                                        <FormItem><FormLabel>Electrotherapy</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                                        <FormItem><FormLabel>Thokkanam / Herbal Remedies</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
                                     )} />
                                 </div>
                                 <FormField control={form.control} name="exercisePrescription" render={({ field }) => (

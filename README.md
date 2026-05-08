@@ -1,6 +1,6 @@
-# 🏥 PhysioTrack - Physiotherapy Assessment Software
+# 🌿 Aafiya Clinic - Siddha Varmam Assessment Software
 
-A modern, web-based patient assessment system for physiotherapy clinics. Replace paper forms with a beautiful digital interface that saves directly to Google Sheets.
+A modern, web-based patient assessment system for Siddha Varmam clinics. Replace paper forms with a beautiful digital interface that saves directly to Google Sheets.
 
 ![Next.js](https://img.shields.io/badge/Next.js-16.0.7-black)
 ![React](https://img.shields.io/badge/React-19.2.0-blue)
@@ -151,4 +151,4 @@ If you encounter issues:
 
 ---
 
-**Built with ❤️ for physiotherapy clinics** | Last updated: December 2025
+**Built with ❤️ for Siddha Varmam clinics** | Last updated: December 2025
