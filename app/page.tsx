@@ -38,10 +38,10 @@ export default async function Home() {
               Refresh
             </Button>
           </form>
-          <Button asChild size="sm" className="flex-1 sm:flex-none">
+          <Button asChild size="sm" className="bg-slate-900 text-white hover:bg-slate-800 rounded-xl font-bold shadow-md px-4">
             <Link href="/new">
               <PlusCircle className="mr-2 h-4 w-4" />
-              <span className="hidden xs:inline">New Assessment</span>
+              <span className="hidden xs:inline">New Patient</span>
               <span className="xs:hidden">New</span>
             </Link>
           </Button>
