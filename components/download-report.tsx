@@ -47,18 +47,28 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
                 y += Math.max(lines.length * 5, 6) + 2;
             };
 
-            // Load Logo
+            // Load Logo & Signature
             let logoBase64 = null;
+            let sigBase64 = null;
+            
             try {
-                const response = await fetch('/logo-removebg-preview.png');
-                const blob = await response.blob();
+                const logoRes = await fetch('/logo-removebg-preview.png');
+                const logoBlob = await logoRes.blob();
                 logoBase64 = await new Promise<string>((resolve) => {
                     const reader = new FileReader();
                     reader.onloadend = () => resolve(reader.result as string);
-                    reader.readAsDataURL(blob);
+                    reader.readAsDataURL(logoBlob);
+                });
+                
+                const sigRes = await fetch('/Untitled_design-removebg-preview.png');
+                const sigBlob = await sigRes.blob();
+                sigBase64 = await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result as string);
+                    reader.readAsDataURL(sigBlob);
                 });
             } catch (e) {
-                console.warn('Failed to load logo', e);
+                console.warn('Failed to load assets', e);
             }
 
             // ── Header ──
@@ -124,10 +134,30 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
             }
             addField('Pending Amount', `Rs. ${assessment.PendingAmount || '0'}`);
             
-            y += 20;
+            // ── Doctor Signature Section ──
+            y += 5;
+            if (y > 240) { doc.addPage(); y = 20; }
+            
+            const rightPos = pageWidth - 60;
+            if (sigBase64) {
+                doc.addImage(sigBase64, 'PNG', rightPos, y, 40, 20);
+                y += 18;
+            } else {
+                y += 20; // Space for signature even if image fails
+            }
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(30, 41, 59);
+            doc.text('Dr. J. Abdullah MD(S)', rightPos + 20, y, { align: 'center' });
+            y += 5;
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Consultant', rightPos + 20, y, { align: 'center' });
+            y += 15;
 
             // ── Footer ──
-            if (y > 250) { doc.addPage(); y = 15; }
+            if (y > 270) { doc.addPage(); y = 15; }
             doc.setDrawColor(21, 128, 61);
             doc.setLineWidth(0.5);
             doc.line(14, y, pageWidth - 14, y);
