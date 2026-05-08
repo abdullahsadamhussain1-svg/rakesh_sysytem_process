@@ -34,6 +34,7 @@ export async function PUT(
             FeesCollected: body.feesCollected ?? existingRow.FeesCollected ?? "",
             PaidAmount: body.paidAmount ?? existingRow.PaidAmount ?? "",
             PendingAmount: body.pendingAmount ?? existingRow.PendingAmount ?? "",
+            existingMedia: body.existingMedia || [],
             files: body.files || [] // Only send new files, Apps Script preserves old ones if blank
         };
 

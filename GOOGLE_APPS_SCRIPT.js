@@ -48,6 +48,9 @@ function doPost(e) {
       });
     }
 
+    // Combine existing and new media correctly
+    const finalMedia = (data.existingMedia || []).concat(mediaUrls);
+
     // 2. Map Data to Sheet1 (Locked to IST)
     const timestamp = Utilities.formatDate(new Date(), "Asia/Kolkata", "yyyy-MM-dd HH:mm:ss");
     const headers = getCoreHeaders();
@@ -56,7 +59,7 @@ function doPost(e) {
       if (header === "Timestamp") return timestamp;
       if (header.startsWith("Media")) {
         const index = parseInt(header.replace("Media", "")) - 1;
-        return mediaUrls[index] || data[header] || "";
+        return finalMedia[index] || "";
       }
       const val = data[header];
       return val !== undefined ? val : "";
