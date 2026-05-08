@@ -50,7 +50,7 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
             // Load Logo
             let logoBase64 = null;
             try {
-                const response = await fetch('/logo.jpeg');
+                const response = await fetch('/logo-removebg-preview.png');
                 const blob = await response.blob();
                 logoBase64 = await new Promise<string>((resolve) => {
                     const reader = new FileReader();
@@ -68,7 +68,7 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
             if (logoBase64) {
                 doc.setFillColor(255, 255, 255);
                 doc.circle(pageWidth / 2, 16, 9, 'F');
-                doc.addImage(logoBase64, 'JPEG', pageWidth / 2 - 8, 8, 16, 16);
+                doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 8, 8, 16, 16);
                 
                 doc.setTextColor(255, 255, 255);
                 doc.setFontSize(15);
