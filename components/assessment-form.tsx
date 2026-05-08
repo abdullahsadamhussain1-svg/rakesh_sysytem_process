@@ -405,7 +405,7 @@ export function AssessmentForm() {
                         <Button 
                             type="submit" 
                             disabled={isSubmitting} 
-                            className="w-full sm:w-auto h-14 px-10 rounded-2xl font-black tracking-widest shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 min-w-[200px] order-1 sm:order-2"
+                            className="w-full sm:w-auto h-14 px-10 rounded-2xl bg-slate-900 text-white hover:bg-black font-black tracking-widest shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 min-w-[220px] order-1 sm:order-2"
                         >
                             {isSubmitting ? (
                                 <span className="flex items-center gap-2">

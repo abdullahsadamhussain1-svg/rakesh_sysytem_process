@@ -444,7 +444,7 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 sm:p-6 rounded-3xl shadow-xl border border-slate-100">
                     <Button type="button" variant="ghost" asChild className="w-full sm:w-auto rounded-xl h-12 px-6 font-bold text-slate-400 hover:text-slate-900 transition-all active:scale-[0.98] order-2 sm:order-1"><Link href={`/assessment/${assessmentIndex}`}><ArrowLeft className="h-4 w-4 mr-2" /> Discard Changes</Link></Button>
                     <div className="flex w-full sm:w-auto gap-4 order-1 sm:order-2">
-                        <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto h-14 px-10 rounded-2xl font-black tracking-widest shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 min-w-[220px]">
+                        <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto h-14 px-10 rounded-2xl bg-slate-900 text-white hover:bg-black font-black tracking-widest shadow-2xl transition-all active:scale-[0.98] disabled:opacity-50 min-w-[220px]">
                             {isSubmitting ? (
                                 <span className="flex items-center gap-2">
                                     <Activity className="h-5 w-5 animate-pulse" />
