@@ -31,7 +31,10 @@ export async function getFromGoogleSheet() {
         headers: {
             "Accept": "application/json",
         },
-        cache: 'no-store'
+        next: { 
+            revalidate: 3600, 
+            tags: ['assessments'] 
+        }
     });
 
     if (!response.ok) {
