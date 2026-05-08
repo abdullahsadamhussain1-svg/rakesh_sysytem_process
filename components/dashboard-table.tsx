@@ -17,7 +17,7 @@ import { Search, RefreshCw, Banknote } from "lucide-react";
 import { formatDateShort } from "@/lib/format-date";
 
 interface Assessment {
-    id: number | string;
+    rowIndex?: number;
     Date: string;
     Timestamp?: string;
     PatientName: string;
@@ -110,7 +110,7 @@ export function DashboardTable({ assessments }: DashboardTableProps) {
                                 </TableRow>
                             ) : (
                                 filteredAssessments.map((assessment) => {
-                                    const targetId = assessment.id;
+                                    const targetId = assessment.rowIndex;
                                     const hasPending = Boolean(assessment.PendingAmount && Number(assessment.PendingAmount) > 0);
 
                                     return (
