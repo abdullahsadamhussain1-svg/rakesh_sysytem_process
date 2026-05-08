@@ -21,7 +21,7 @@ export async function PUT(
         // 2. Build update payload combining new data with existing values where not provided
         const payload = {
             action: 'update',
-            rowIndex: existingRow.rowIndex,
+            rowIndex: existingRow.rowIndex + 2, // Must be +2 because row 1 is headers and rowIndex is 0-indexed
             PatientName: body.patientName ?? existingRow.PatientName,
             Date: body.date ?? existingRow.Date,
             PhoneNumber: body.phoneNumber ?? existingRow.PhoneNumber ?? "",
