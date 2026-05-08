@@ -412,7 +412,7 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
                                                         ) : (
                                                             <img src={convertDriveUrl(url)} className="w-full h-full object-cover" />
                                                         )}
-                                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Button type="button" variant="destructive" size="icon" onClick={() => removeExisting(index)} className="h-8 w-8 rounded-full shadow-lg"><X className="h-4 w-4" /></Button></div>
+                                                        <div className="absolute top-2 right-2 z-10"><Button type="button" variant="destructive" size="icon" onClick={() => removeExisting(index)} className="h-6 w-6 rounded-full shadow-lg"><X className="h-3 w-3" /></Button></div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -424,7 +424,7 @@ export function EditAssessmentForm({ assessment, assessmentIndex }: EditFormProp
                                             {mediaFiles.map((mf, index) => (
                                                 <div key={index} className="relative aspect-square rounded-2xl overflow-hidden border-2 border-primary/20 shadow-md group bg-black animate-in fade-in zoom-in duration-300">
                                                     {mf.type === 'image' ? ( <img src={mf.base64} className="w-full h-full object-cover" /> ) : ( <div className="w-full h-full flex flex-col items-center justify-center gap-2"><FileVideo className="h-8 w-8 text-primary" /><span className="text-[8px] font-bold text-white bg-red-600 px-1.5 py-0.5 rounded uppercase">NEW VIDEO</span></div> )}
-                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"><Button type="button" variant="destructive" size="icon" onClick={() => removeFile(index)} className="h-8 w-8 rounded-full shadow-lg"><X className="h-4 w-4" /></Button></div>
+                                                    <div className="absolute top-2 right-2 z-10"><Button type="button" variant="destructive" size="icon" onClick={() => removeFile(index)} className="h-6 w-6 rounded-full shadow-lg"><X className="h-3 w-3" /></Button></div>
                                                 </div>
                                             ))}
                                             {[...Array(Math.max(0, 4 - mediaFiles.length - existingMedia.length))].map((_, i) => (
