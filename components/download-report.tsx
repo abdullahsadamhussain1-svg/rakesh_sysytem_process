@@ -72,8 +72,9 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
             }
 
             // ── Header ──
+            const headerHeight = 75;
             doc.setFillColor(21, 128, 61);
-            doc.rect(0, 0, pageWidth, logoBase64 ? 50 : 40, 'F');
+            doc.rect(0, 0, pageWidth, headerHeight, 'F');
             
             if (logoBase64) {
                 doc.setFillColor(255, 255, 255);
@@ -81,28 +82,67 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
                 doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 8, 8, 16, 16);
                 
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(15);
+                doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
                 doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 32, { align: 'center' });
-                doc.setFontSize(9);
+                
+                doc.setFontSize(8);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 38, { align: 'center' });
-                doc.setFontSize(11);
+                doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 37, { align: 'center' });
+
+                // Left Side Details
+                doc.setFontSize(8);
+                doc.text([
+                    'Dr. J. Abdullah MD(S)',
+                    'Lecturer',
+                    'JSA Medical College for Siddha',
+                    'and Research Center, Ulundurpet'
+                ], 14, 45);
+
+                // Right Side Details
+                doc.text([
+                    'Near best school',
+                    'Andakulathar street',
+                    'Mangalampet, Pin-606104',
+                    'Ph. 9698929272',
+                    'Virudhachalam tk, Tamilnadu'
+                ], pageWidth - 14, 45, { align: 'right' });
+
+                doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
-                doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 46, { align: 'center' });
-                y = 60;
+                doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 68, { align: 'center' });
+                y = 85;
             } else {
                 doc.setTextColor(255, 255, 255);
-                doc.setFontSize(15);
+                doc.setFontSize(16);
                 doc.setFont('helvetica', 'bold');
                 doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 16, { align: 'center' });
-                doc.setFontSize(9);
+                
+                // Left Side Details
+                doc.setFontSize(8);
                 doc.setFont('helvetica', 'normal');
+                doc.text([
+                    'Dr. J. Abdullah MD(S)',
+                    'Lecturer',
+                    'JSA Medical College for Siddha',
+                    'and Research Center, Ulundurpet'
+                ], 14, 25);
+
+                // Right Side Details
+                doc.text([
+                    'Near best school',
+                    'Andakulathar street',
+                    'Mangalampet, Pin-606104',
+                    'Ph. 9698929272',
+                    'Virudhachalam tk, Tamilnadu'
+                ], pageWidth - 14, 25, { align: 'right' });
+
+                doc.setFontSize(8);
                 doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 23, { align: 'center' });
-                doc.setFontSize(11);
+                doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
-                doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 32, { align: 'center' });
-                y = 50;
+                doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 50, { align: 'center' });
+                y = 65;
             }
 
             // ── Patient Demographics ──
