@@ -76,73 +76,76 @@ export function DownloadReportButton({ assessment, className }: ReportProps) {
             doc.setFillColor(21, 128, 61);
             doc.rect(0, 0, pageWidth, headerHeight, 'F');
             
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            
             if (logoBase64) {
-                doc.setFillColor(255, 255, 255);
-                doc.circle(pageWidth / 2, 16, 9, 'F');
-                doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 8, 8, 16, 16);
+                // 1. Clinic Name at top
+                doc.setFontSize(18);
+                doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 14, { align: 'center' });
                 
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 32, { align: 'center' });
-                
-                doc.setFontSize(8);
+                // 2. Record ID
+                doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
-                doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 37, { align: 'center' });
+                doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 20, { align: 'center' });
 
-                // Left Side Details
+                // 3. Logo in center
+                doc.setFillColor(255, 255, 255);
+                doc.circle(pageWidth / 2, 40, 10, 'F');
+                doc.addImage(logoBase64, 'PNG', pageWidth / 2 - 8, 32, 16, 16);
+
+                // 4. Left Side Details
                 doc.setFontSize(8);
                 doc.text([
                     'Dr. J. Abdullah MD(S)',
                     'Lecturer',
                     'JSA Medical College for Siddha',
                     'and Research Center, Ulundurpet'
-                ], 14, 45);
+                ], 14, 35);
 
-                // Right Side Details
+                // 5. Right Side Details
                 doc.text([
                     'Near best school',
                     'Andakulathar street',
                     'Mangalampet, Pin-606104',
                     'Ph. 9698929272',
                     'Virudhachalam tk, Tamilnadu'
-                ], pageWidth - 14, 45, { align: 'right' });
+                ], pageWidth - 14, 35, { align: 'right' });
 
+                // 6. Summary Title
                 doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
                 doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 68, { align: 'center' });
                 y = 85;
             } else {
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(16);
-                doc.setFont('helvetica', 'bold');
-                doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 16, { align: 'center' });
+                // Fallback without logo
+                doc.setFontSize(18);
+                doc.text('AAFIYA SIDDHA VARMAM CLINIC', pageWidth / 2, 14, { align: 'center' });
                 
-                // Left Side Details
-                doc.setFontSize(8);
+                doc.setFontSize(9);
                 doc.setFont('helvetica', 'normal');
+                doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 20, { align: 'center' });
+
+                doc.setFontSize(8);
                 doc.text([
                     'Dr. J. Abdullah MD(S)',
                     'Lecturer',
                     'JSA Medical College for Siddha',
                     'and Research Center, Ulundurpet'
-                ], 14, 25);
+                ], 14, 30);
 
-                // Right Side Details
                 doc.text([
                     'Near best school',
                     'Andakulathar street',
                     'Mangalampet, Pin-606104',
                     'Ph. 9698929272',
                     'Virudhachalam tk, Tamilnadu'
-                ], pageWidth - 14, 25, { align: 'right' });
+                ], pageWidth - 14, 30, { align: 'right' });
 
-                doc.setFontSize(8);
-                doc.text(`Record ID: #${String(assessment.rowIndex || 'NEW').padStart(4, '0')}`, pageWidth / 2, 23, { align: 'center' });
                 doc.setFontSize(12);
                 doc.setFont('helvetica', 'bold');
-                doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 50, { align: 'center' });
-                y = 65;
+                doc.text('CLINICAL SUMMARY & INVOICE', pageWidth / 2, 55, { align: 'center' });
+                y = 70;
             }
 
             // ── Patient Demographics ──
